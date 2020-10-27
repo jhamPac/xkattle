@@ -1,0 +1,7 @@
+{
+    "genesis_time": "2020-10-27T00:00:00.000000000Z",
+    "chain_id": "xkattle-ledger",
+    "balances": {
+        "alice": 1000000
+    }
+}
