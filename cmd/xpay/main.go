@@ -8,14 +8,16 @@ import (
 )
 
 func main() {
-	var xpayCmd = &cobra.Command{
+	var rootCmd = &cobra.Command{
 		Use:   "xpay",
 		Short: "xKattle blockchain CLI.",
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
 
-	err := xpayCmd.Execute()
+	rootCmd.AddCommand(versionCmd)
+
+	err := rootCmd.Execute()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

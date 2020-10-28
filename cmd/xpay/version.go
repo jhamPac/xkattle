@@ -11,7 +11,7 @@ const minor = "1"
 const patch = "0"
 const desc = "TX ADD && Balances List"
 
-var cmd = &cobra.Command{
+var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Displays xpay version.",
 	Run: func(cmd *cobra.Command, args []string) {
