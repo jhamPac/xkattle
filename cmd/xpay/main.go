@@ -10,7 +10,7 @@ import (
 func main() {
 	var xpayCmd = &cobra.Command{
 		Use:   "xpay",
-		Short: "xKattle blockchain CLI",
+		Short: "xKattle blockchain CLI.",
 		Run: func(cmd *cobra.Command, args []string) {
 		},
 	}
