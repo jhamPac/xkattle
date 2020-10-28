@@ -12,7 +12,6 @@ func main() {
 		Use:   "xpay",
 		Short: "xKattle blockchain CLI",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Hello")
 		},
 	}
 
