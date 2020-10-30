@@ -46,7 +46,7 @@ func NewStateFromDisk() (*State, error) {
 
 	scanner := bufio.NewScanner(f)
 
-	state := &State{balances, make([]Tx, 0), f}
+	state := &State{balances, make([]Tx, 0), f, Snapshot{}}
 
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
