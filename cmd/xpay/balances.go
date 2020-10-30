@@ -22,6 +22,7 @@ func balancesCmd() *cobra.Command {
 
 	// xpay balances list ...
 	cmd.AddCommand(balancesListCmd)
+	return cmd
 }
 
 var balancesListCmd = &cobra.Command{
