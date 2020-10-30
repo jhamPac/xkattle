@@ -11,7 +11,7 @@ import (
 func balancesCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "balances",
-		Short: "Interact with the balances (list...).",
+		Short: "Interact with the balances (list...)",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			return incorrectUsageErr()
 		},
@@ -37,7 +37,7 @@ var balancesListCmd = &cobra.Command{
 		defer state.Close()
 
 		fmt.Println("Account balances:")
-		fmt.Println("xxxxxxxxxxxxxxxxxx")
+		fmt.Println("_________________")
 		fmt.Println("")
 
 		for account, balance := range state.Balances {
