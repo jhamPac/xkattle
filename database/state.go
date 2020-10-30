@@ -61,6 +61,11 @@ func NewStateFromDisk() (*State, error) {
 		}
 	}
 
+	err = state.doSnapshot()
+	if err != nil {
+		return nil, err
+	}
+
 	return state, nil
 }
 
