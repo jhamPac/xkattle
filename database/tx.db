@@ -3,3 +3,5 @@
 {"from": "alice", "to": "bob", "value": 2000, "data":""}
 {"from": "alice", "to": "alice", "value": 100, "data":"reward"}
 {"from": "bob", "to": "alice", "value": 1, "data":""}
+{"from":"alice","to":"eve","value":10000,"data":""}
+{"from":"alice","to":"bob","value":10000,"data":""}

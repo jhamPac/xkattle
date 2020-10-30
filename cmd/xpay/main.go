@@ -17,6 +17,7 @@ func main() {
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(balancesCmd())
+	rootCmd.AddCommand(txCmd())
 
 	err := rootCmd.Execute()
 	if err != nil {
