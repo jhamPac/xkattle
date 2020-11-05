@@ -2,10 +2,8 @@ package database
 
 import (
 	"bufio"
-	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -107,11 +105,36 @@ func (s *State) Persist() (Hash, error) {
 	}
 
 	meta := BlockMeta{blockHash, block}
+
+	metaJSON, err := json.Marshal(meta)
+	if err != nil {
+		return Hash{}, err
+	}
+
+	fmt.Printf("Persisting new Block to disk:\n")
+	fmt.Printf("\t%s\n", metaJSON)
+
+	if _, err = s.dbFile.Write(append(metaJSON, '\n')); err != nil {
+		return Hash{}, err
+	}
+
+	s.latestBlockHash = blockHash
+	s.txMempool = []Tx{}
+	return s.latestBlockHash, nil
 }
 
 // Close references to the file
 func (s *State) Close() {
 	s.dbFile.Close()
+}
+
+func (s *State) applyBlock(b Block) error {
+	for _, tx := range b.TXs {
+		if err := s.apply(tx); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *State) apply(tx Tx) error {
@@ -126,21 +149,6 @@ func (s *State) apply(tx Tx) error {
 
 	s.Balances[tx.From] -= tx.Value
 	s.Balances[tx.To] += tx.Value
-
-	return nil
-}
-
-func (s *State) doSnapshot() error {
-	_, err := s.dbFile.Seek(0, 0)
-	if err != nil {
-		return err
-	}
-
-	txsData, err := ioutil.ReadAll(s.dbFile)
-	if err != nil {
-		return err
-	}
-	s.snapshot = sha256.Sum256(txsData)
 
 	return nil
 }
