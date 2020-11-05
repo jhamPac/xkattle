@@ -20,8 +20,8 @@ func (h *Hash) UnmarshalText(data []byte) error {
 	return err
 }
 
-// dbFS represents the meta portion of a hash and block in the db file
-type dbFS struct {
+// BlockMeta represents the meta portion of a hash and block in the db file
+type BlockMeta struct {
 	Key   Hash  `json:"hash"`
 	Value Block `json:"block"`
 }

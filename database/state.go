@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // State is the main business logic of the ledger
@@ -50,19 +51,19 @@ func NewStateFromDisk() (*State, error) {
 			return nil, err
 		}
 
-		dbFSJSON := scanner.Bytes()
-		var dbFS dbFS
-		err = json.Unmarshal(dbFSJSON, &dbFS)
+		metaJSON := scanner.Bytes()
+		var meta BlockMeta
+		err = json.Unmarshal(metaJSON, &meta)
 		if err != nil {
 			return nil, err
 		}
 
-		err = state.applyBlock(dbFS.Value)
+		err = state.applyBlock(meta.Value)
 		if err != nil {
 			return nil, err
 		}
 
-		state.latestBlockHash = dbFS.Key
+		state.latestBlockHash = meta.Key
 	}
 
 	err = state.doSnapshot()
@@ -73,13 +74,23 @@ func NewStateFromDisk() (*State, error) {
 	return state, nil
 }
 
-// LatestSnapshot returns the current hash of the tx.db file
-func (s *State) LatestSnapshot() Snapshot {
-	return s.snapshot
+// LatestBlockHash returns the current hash of the tx.db file
+func (s *State) LatestBlockHash() Hash {
+	return s.latestBlockHash
 }
 
-// Add a tx to the state mempool
-func (s *State) Add(tx Tx) error {
+// AddBlock iterates over each tx in a block and calls Addtx
+func (s *State) AddBlock(b Block) error {
+	for _, tx := range b.TXs {
+		if err := s.AddTx(tx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// AddTx adds a tx to the state mempool
+func (s *State) AddTx(tx Tx) error {
 	if err := s.apply(tx); err != nil {
 		return err
 	}
@@ -88,31 +99,14 @@ func (s *State) Add(tx Tx) error {
 }
 
 // Persist mempool to disk
-func (s *State) Persist() (Snapshot, error) {
-	mempool := make([]Tx, len(s.txMempool))
-	copy(mempool, s.txMempool)
-
-	for i := 0; i < len(mempool); i++ {
-		txJSON, err := json.Marshal(s.txMempool[i])
-		if err != nil {
-			return Snapshot{}, err
-		}
-
-		fmt.Printf("Persisting new TX to disk:\n")
-		fmt.Printf("\t%s\n", txJSON)
-		if _, err = s.dbFile.Write(append(txJSON, '\n')); err != nil {
-			return Snapshot{}, err
-		}
-
-		err = s.doSnapshot()
-		if err != nil {
-			return Snapshot{}, err
-		}
-		fmt.Printf("New DB Snapshot: %x\n", s.snapshot)
-
-		s.txMempool = append(s.txMempool[:i], s.txMempool[i+1:]...)
+func (s *State) Persist() (Hash, error) {
+	block := NewBlock(s.latestBlockHash, uint64(time.Now().Unix()), s.txMempool)
+	blockHash, err := block.Hash()
+	if err != nil {
+		return Hash{}, err
 	}
-	return s.snapshot, nil
+
+	meta := BlockMeta{blockHash, block}
 }
 
 // Close references to the file
