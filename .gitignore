@@ -17,3 +17,4 @@
 # Misc
 .vscode
 tx.db
+block.db
