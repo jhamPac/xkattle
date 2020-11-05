@@ -20,6 +20,12 @@ func (h *Hash) UnmarshalText(data []byte) error {
 	return err
 }
 
+// dbFS represents the meta portion of a hash and block in the db file
+type dbFS struct {
+	Key   Hash  `json:"hash"`
+	Value Block `json:"block"`
+}
+
 // Block represents a block on the chain with a group of txs
 type Block struct {
 	Header BlockHeader `json:"header"`
@@ -30,12 +36,6 @@ type Block struct {
 type BlockHeader struct {
 	Parent Hash   `json:"parent"`
 	Time   uint64 `json:"time"`
-}
-
-// BlockFS not sure what this is at the moment
-type BlockFS struct {
-	Key   Hash  `json:"hash"`
-	Value Block `json:"block"`
 }
 
 // NewBlock instantiates and returns a Block

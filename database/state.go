@@ -10,16 +10,13 @@ import (
 	"path/filepath"
 )
 
-// Snapshot represents a content hash
-type Snapshot [32]byte
-
 // State is the main business logic of the ledger
 type State struct {
 	Balances  map[Account]uint
 	txMempool []Tx
 
-	dbFile   *os.File
-	snapshot Snapshot
+	dbFile          *os.File
+	latestBlockHash Hash
 }
 
 // NewStateFromDisk starts the ledger from the genesis
@@ -39,26 +36,33 @@ func NewStateFromDisk() (*State, error) {
 		balances[account] = balance
 	}
 
-	f, err := os.OpenFile(filepath.Join(cwd, "database", "tx.db"), os.O_APPEND|os.O_RDWR, 0600)
+	f, err := os.OpenFile(filepath.Join(cwd, "database", "block.db"), os.O_APPEND|os.O_RDWR, 0600)
 	if err != nil {
 		return nil, err
 	}
 
 	scanner := bufio.NewScanner(f)
 
-	state := &State{balances, make([]Tx, 0), f, Snapshot{}}
+	state := &State{balances, make([]Tx, 0), f, Hash{}}
 
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
 			return nil, err
 		}
 
-		var tx Tx
-		json.Unmarshal(scanner.Bytes(), &tx)
-
-		if err := state.apply(tx); err != nil {
+		dbFSJSON := scanner.Bytes()
+		var dbFS dbFS
+		err = json.Unmarshal(dbFSJSON, &dbFS)
+		if err != nil {
 			return nil, err
 		}
+
+		err = state.applyBlock(dbFS.Value)
+		if err != nil {
+			return nil, err
+		}
+
+		state.latestBlockHash = dbFS.Key
 	}
 
 	err = state.doSnapshot()
