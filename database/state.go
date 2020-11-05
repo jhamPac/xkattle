@@ -64,11 +64,6 @@ func NewStateFromDisk() (*State, error) {
 		state.latestBlockHash = meta.Key
 	}
 
-	err = state.doSnapshot()
-	if err != nil {
-		return nil, err
-	}
-
 	return state, nil
 }
 

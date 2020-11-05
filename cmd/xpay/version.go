@@ -7,9 +7,9 @@ import (
 )
 
 const major = "0"
-const minor = "1"
+const minor = "4"
 const patch = "0"
-const desc = "TX ADD && Balances List"
+const desc = "Blockchain in Go"
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
