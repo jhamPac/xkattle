@@ -105,7 +105,6 @@ func (s *State) Persist() (Hash, error) {
 	}
 
 	meta := BlockMeta{blockHash, block}
-
 	metaJSON, err := json.Marshal(meta)
 	if err != nil {
 		return Hash{}, err
@@ -119,6 +118,8 @@ func (s *State) Persist() (Hash, error) {
 	}
 
 	s.latestBlockHash = blockHash
+
+	// reset mempool
 	s.txMempool = []Tx{}
 	return s.latestBlockHash, nil
 }
