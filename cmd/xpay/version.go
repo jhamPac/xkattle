@@ -7,7 +7,7 @@ import (
 )
 
 const major = "0"
-const minor = "4"
+const minor = "5"
 const patch = "0"
 const desc = "Blockchain in Go"
 
